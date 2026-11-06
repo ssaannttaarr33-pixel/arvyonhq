@@ -1,0 +1,1632 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080d19">
+<meta name="description" content="NUBIRA: conecta, comparte y juega.">
+<title>NUBIRA — Tu espacio digital</title>
+
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#080d19;
+  --panel:#101827;
+  --panel2:#151f32;
+  --line:rgba(159,181,220,.13);
+  --text:#edf3ff;
+  --muted:#91a1bb;
+  --blue:#4d8dff;
+  --purple:#9565f5;
+  --cyan:#39d4e8;
+  --green:#48d6a0;
+  --accent:#4d8dff;
+  --radius:17px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  min-height:100vh;
+  color:var(--text);
+  background:
+    radial-gradient(ellipse at 10% 0%,#23407835,transparent 35%),
+    radial-gradient(ellipse at 90% 10%,#693d9630,transparent 35%),
+    var(--bg);
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+button:disabled{cursor:not-allowed;opacity:.5}
+.app{
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:250px minmax(0,1fr);
+}
+.sidebar{
+  position:sticky;
+  top:0;
+  height:100vh;
+  min-height:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  overscroll-behavior:contain;
+  padding:23px 15px;
+  scrollbar-width:thin;
+  scrollbar-color:var(--accent) transparent;
+  border-right:1px solid var(--line);
+  background:#080d19ed;
+  backdrop-filter:blur(18px);
+  display:flex;
+  flex-direction:column;
+  z-index:20;
+}
+.sidebar::-webkit-scrollbar{width:6px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--accent);border-radius:10px}
+.sidebar::-webkit-scrollbar-track{background:transparent}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:5px 9px 28px;
+}
+.brand-mark{
+  width:43px;height:43px;
+  display:grid;place-items:center;
+  border-radius:14px;
+  font-size:20px;font-weight:950;
+  background:linear-gradient(135deg,var(--blue),var(--purple),var(--cyan));
+  box-shadow:0 7px 25px #4d8dff55;
+}
+.brand-name{font-size:21px;font-weight:900;letter-spacing:2px}
+.brand-sub{font-size:9px;color:var(--muted);letter-spacing:1.5px}
+.nav-label{
+  color:#64748b;font-size:10px;font-weight:800;
+  letter-spacing:1.7px;padding:12px;
+}
+.nav{display:grid;gap:5px}
+.nav button{
+  display:flex;align-items:center;gap:12px;
+  width:100%;padding:11px 12px;
+  color:var(--muted);background:transparent;
+  border:1px solid transparent;border-radius:11px;
+  text-align:left;transition:.2s;
+}
+.nav button:hover{background:#ffffff0b;color:white}
+.nav button:focus-visible,.btn:focus-visible,.icon-btn:focus-visible,
+.quick:focus-visible,.search input:focus-visible{
+  outline:2px solid var(--cyan);outline-offset:3px;
+}
+.nav button.active{
+  color:white;
+  border-color:#7199ff35;
+  background:linear-gradient(100deg,#4d8dff2c,#9565f51a);
+  box-shadow:inset 3px 0 var(--accent);
+}
+.nav-icon{width:21px;text-align:center;font-size:17px}
+.sidebar-bottom{margin-top:auto}
+.status-card{
+  padding:13px;border:1px solid var(--line);
+  border-radius:14px;background:#4d8dff12;
+}
+.status-top{font-size:11px;font-weight:750}
+.dot{
+  display:inline-block;width:8px;height:8px;
+  margin-right:6px;border-radius:50%;
+  background:var(--green);box-shadow:0 0 10px var(--green);
+}
+.status-card p{font-size:10px;line-height:1.5;color:var(--muted)}
+.main{min-width:0}
+.topbar{
+  height:72px;padding:0 30px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:15px;position:sticky;top:0;z-index:10;
+  background:#080d19c9;backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--line);
+}
+.crumb{font-size:12px;color:var(--muted)}
+.crumb strong{color:var(--text)}
+.top-actions{display:flex;align-items:center;gap:10px}
+.search-wrap{position:relative;width:230px}
+.search{
+  display:flex;align-items:center;gap:8px;
+  width:230px;padding:9px 12px;
+  border:1px solid var(--line);border-radius:10px;
+  background:#ffffff08;color:var(--muted);
+}
+.search input{
+  min-width:0;width:100%;border:0;outline:0;
+  background:transparent;color:var(--text);
+}
+.search-results{
+  position:absolute;top:calc(100% + 8px);left:0;right:0;z-index:40;
+  padding:6px;border:1px solid var(--line);border-radius:13px;
+  background:var(--panel);box-shadow:0 16px 40px #0006;
+  max-height: min(60vh,360px);overflow:auto;
+}
+.search-results[hidden]{display:none}
+.search-result{
+  width:100%;display:flex;align-items:center;gap:10px;
+  padding:10px;border:0;border-radius:9px;background:transparent;
+  color:var(--text);text-align:left;font-size:12px;
+}
+.search-result:hover,.search-result[aria-selected="true"]{background:#4d8dff20}
+.search-result small{display:block;color:var(--muted);font-size:10px;margin-top:3px}
+.search-empty{padding:12px;color:var(--muted);font-size:11px}
+.sidebar-backdrop{display:none}
+body.menu-open{overflow:hidden}
+.icon-btn{
+  width:37px;height:37px;
+  border:1px solid var(--line);border-radius:10px;
+  color:var(--muted);background:#ffffff08;
+}
+.avatar{
+  width:37px;height:37px;border-radius:12px;
+  display:grid;place-items:center;overflow:hidden;
+  color:white;font-size:12px;font-weight:850;
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.content{max-width:1500px;margin:auto;padding:30px}
+.page{display:none;animation:fade .2s ease}
+.page.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.eyebrow{
+  color:var(--cyan);font-size:10px;font-weight:850;
+  letter-spacing:2px;text-transform:uppercase;
+}
+h1{font-size:clamp(27px,3vw,38px);line-height:1.12;margin:9px 0}
+h2{font-size:19px;margin:0}
+h3{font-size:14px;margin:0}
+p{line-height:1.6}
+.subtext{max-width:700px;color:var(--muted);font-size:12px}
+.gradient{
+  background:linear-gradient(90deg,#75aaff,#b18aff,#64e3ee);
+  color:transparent;background-clip:text;
+}
+.hero{
+  padding:32px;border-radius:23px;
+  border:1px solid #7199ff30;
+  background:
+    radial-gradient(circle at 85% 30%,#39d4e82c,transparent 25%),
+    radial-gradient(circle at 75% 100%,#9565f540,transparent 35%),
+    linear-gradient(115deg,#142544,#11192c 65%,#17162e);
+  overflow:hidden;position:relative;
+}
+.hero:after{
+  content:"N";position:absolute;right:7%;top:-65px;
+  font-size:280px;font-weight:950;color:#ffffff08;
+}
+.hero-inner{position:relative;z-index:1;max-width:680px}
+.hero h1{font-size:clamp(32px,4vw,48px)}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.btn{
+  border:1px solid var(--line);border-radius:10px;
+  padding:10px 15px;color:var(--text);
+  background:#ffffff09;font-size:12px;font-weight:750;
+}
+.btn:hover{border-color:var(--accent);filter:brightness(1.1)}
+.btn.primary{border:0;background:linear-gradient(100deg,var(--blue),var(--purple))}
+.btn.small{padding:8px 11px}
+.grid{display:grid;gap:14px}
+.stats{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:16px}
+.card,.stat,.panel{
+  border:1px solid var(--line);border-radius:var(--radius);
+  background:linear-gradient(145deg,#141f31ed,#0d1625ed);
+}
+.card,.panel{padding:19px}
+.stat{padding:16px}
+.stat-label{font-size:10px;color:var(--muted)}
+.stat-value{font-size:22px;font-weight:850;margin-top:8px}
+.stat-note{font-size:10px;color:#8192ad}
+.section-head{
+  display:flex;justify-content:space-between;align-items:center;
+  gap:12px;margin:28px 0 13px;
+}
+.section-head p{font-size:11px;color:var(--muted);margin:4px 0}
+.modules{grid-template-columns:repeat(3,minmax(0,1fr))}
+.module{cursor:pointer;transition:.2s;min-height:150px}
+.module:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+.module:hover{transform:translateY(-3px);border-color:#7199ff66}
+.module-icon{
+  width:38px;height:38px;border-radius:11px;
+  display:grid;place-items:center;margin-bottom:13px;
+  background:#4d8dff25;font-size:18px;
+}
+.module p{font-size:11px;color:var(--muted)}
+.module-foot{font-size:10px;color:var(--muted);margin-top:14px}
+.two-col{grid-template-columns:1.3fr 1fr}
+.quick-list{display:grid;gap:9px;margin-top:14px}
+.quick{
+  width:100%;display:flex;align-items:center;gap:10px;
+  text-align:left;padding:11px;border:1px solid var(--line);
+  border-radius:11px;color:var(--text);background:#ffffff06;
+}
+.quick:hover{background:#ffffff10}
+.quick span:last-child{margin-left:auto;color:var(--muted)}
+.page-title{margin-bottom:22px}
+.placeholder{
+  min-height:260px;padding:30px;
+  display:grid;place-items:center;text-align:center;
+  border:1px dashed #8192ad55;border-radius:18px;
+  background:#10182788;
+}
+.placeholder p{max-width:470px;color:var(--muted);font-size:12px}
+.big-icon{font-size:38px;margin-bottom:10px}
+.notice{font-size:10px;color:#8192ad;line-height:1.6;margin-top:12px}
+.tag{
+  display:inline-block;padding:4px 8px;border-radius:20px;
+  border:1px solid var(--line);font-size:9px;color:var(--muted);
+}
+.field{margin:14px 0}
+.field label{display:block;font-size:11px;color:var(--muted);margin-bottom:7px}
+.field input,.field select,.field textarea{
+  width:100%;padding:11px;
+  color:var(--text);background:#080f1d;
+  border:1px solid var(--line);border-radius:10px;outline:none;
+}
+.field textarea{resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus{
+  border-color:var(--accent);
+}
+.field option{background:#101827}
+.row-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.switch-line{
+  display:flex;align-items:center;gap:9px;
+  margin:12px 0;color:var(--muted);font-size:11px;
+}
+.switch-line input{accent-color:var(--accent)}
+.profile-head{display:flex;align-items:center;gap:17px;flex-wrap:wrap}
+.profile-photo{
+  width:86px;height:86px;border-radius:22px;
+  object-fit:cover;background:#202d48;
+  border:2px solid var(--accent);
+}
+.chat-layout{
+  display:grid;grid-template-columns:220px minmax(0,1fr);
+  min-height:400px;border:1px solid var(--line);
+  border-radius:16px;overflow:hidden;background:#0d1625;
+}
+.chat-side{padding:15px;border-right:1px solid var(--line)}
+.friend{padding:12px 8px;font-size:11px;color:var(--muted)}
+.chat-main{display:flex;flex-direction:column;min-width:0}
+.chat-head{padding:14px;border-bottom:1px solid var(--line);font-size:12px}
+.chat-messages{
+  padding:16px;flex:1;min-height:270px;
+  display:flex;flex-direction:column;gap:10px;overflow:auto;
+}
+.bubble{
+  max-width:78%;padding:10px 12px;border-radius:12px;
+  background:#1a2940;font-size:12px;overflow-wrap:anywhere;
+}
+.bubble.mine{
+  align-self:flex-end;
+  background:linear-gradient(110deg,#397ee9,#7959d9);
+}
+.chat-compose{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line)}
+.chat-compose input{
+  flex:1;min-width:0;padding:10px;
+  border:1px solid var(--line);border-radius:9px;
+  color:var(--text);background:#080f1d;
+}
+.device-result{
+  display:flex;justify-content:space-between;gap:12px;
+  padding:12px 0;border-bottom:1px solid var(--line);
+  font-size:11px;
+}
+.device-result span:first-child{color:var(--muted)}
+.device-result strong{text-align:right;overflow-wrap:anywhere}
+.footer{
+  padding:28px 0 8px;color:#64748b;
+  text-align:center;font-size:10px;
+}
+.mobile-menu{display:none}
+@media(max-width:1050px){
+  .app{grid-template-columns:220px minmax(0,1fr)}
+  .modules{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .content{padding:23px}
+}
+@media(max-width:760px){
+  .app{display:block}
+  .sidebar{
+    position:fixed;left:0;top:0;width:min(290px,86vw);
+    height:100dvh;min-height:0;overflow-y:auto;
+    transform:translateX(-105%);transition:transform .25s;
+    box-shadow:0 15px 50px #0008;
+  }
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-backdrop{
+    display:block;position:fixed;inset:0;z-index:19;
+    border:0;background:#02061199;opacity:0;visibility:hidden;
+    transition:opacity .2s,visibility .2s;
+  }
+  .sidebar-backdrop.visible{opacity:1;visibility:visible}
+  .topbar{height:64px;padding:0 14px}
+  .mobile-menu{display:inline-grid;place-items:center}
+  .content{padding:19px 14px}
+  .stats,.two-col{grid-template-columns:1fr}
+  .chat-layout{grid-template-columns:1fr}
+  .chat-side{display:none}
+}
+@media(max-width:480px){
+  .modules{grid-template-columns:1fr}
+  .search-wrap{display:none}
+  .hero{padding:23px 18px}
+  .hero h1{font-size:32px}
+  .row-fields{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    scroll-behavior:auto!important;
+    animation-duration:.01ms!important;
+    transition-duration:.01ms!important;
+  }
+}
+
+/* Tema claro */
+html[data-theme="light"]{
+  color-scheme:light;
+  --bg:#eef2fa;
+  --panel:#fff;
+  --panel2:#e9eef8;
+  --line:#cbd5e5;
+  --text:#17243a;
+  --muted:#596b85;
+}
+html[data-theme="light"] body{
+  background:radial-gradient(ellipse at 10% 0%,#4d8dff20,transparent 35%),#eef2fa;
+}
+html[data-theme="light"] .sidebar,
+html[data-theme="light"] .topbar{background:#f5f7fbea}
+html[data-theme="light"] .card,
+html[data-theme="light"] .stat,
+html[data-theme="light"] .panel{background:#ffffff}
+html[data-theme="light"] .field input,
+html[data-theme="light"] .field select,
+html[data-theme="light"] .field textarea,
+html[data-theme="light"] .chat-compose input{background:#f5f7fb;color:#17243a}
+html[data-theme="light"] .chat-layout{background:#fff}
+html[data-theme="light"] .chat-side{border-color:var(--line)}
+html[data-theme="light"] .bubble{background:#e8edf7;color:#17243a}
+html[data-theme="light"] .bubble.mine{background:#477fe5;color:white}
+
+
+/* AJUSTES RESPONSIVE Y ACCESIBILIDAD — NUBIRA */
+html{min-width:320px;scroll-padding-top:84px}
+body{overflow-x:hidden}
+button,a,input,select,textarea{-webkit-tap-highlight-color:transparent}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{
+  outline:2px solid var(--cyan);outline-offset:3px
+}
+.sidebar{
+  height:100vh;height:100dvh;min-height:0;
+  overflow-y:auto;overflow-x:hidden;
+  overscroll-behavior:contain;
+  scrollbar-width:thin;scrollbar-color:var(--accent) transparent;
+}
+.sidebar::-webkit-scrollbar{width:6px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--accent);border-radius:10px}
+.sidebar::-webkit-scrollbar-track{background:transparent}
+.sidebar-bottom{padding-top:18px}
+.main{min-width:0;max-width:100%}
+.content{width:100%;min-width:0}
+.card,.panel,.stat{min-width:0}
+.module{min-width:0}
+.module h3,.module p{overflow-wrap:anywhere}
+.topbar{min-width:0}
+.top-actions{min-width:0}
+.crumb{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px #4d8dff20}
+.nav button{min-height:42px}
+.btn,.icon-btn{min-height:40px}
+.field input,.field select,.field textarea,.chat-compose input{min-height:42px}
+.chat-compose .btn{white-space:nowrap}
+.device-result{align-items:flex-start;flex-wrap:wrap}
+.device-result strong{max-width:65%;white-space:normal}
+
+@media(max-width:1050px){
+  .app{grid-template-columns:218px minmax(0,1fr)}
+  .content{padding:24px}
+  .topbar{padding-inline:22px}
+  .two-col{grid-template-columns:1fr 1fr}
+}
+@media(max-width:760px){
+  .app{display:block;min-height:100vh}
+  .sidebar{
+    position:fixed;inset:0 auto 0 0;width:min(290px,86vw);
+    height:100vh;height:100dvh;
+    transform:translateX(-105%);transition:transform .25s ease;
+    box-shadow:0 15px 50px #0008;
+    z-index:40;
+  }
+  .sidebar.open{transform:translateX(0)}
+  .topbar{height:64px;padding:0 14px;gap:8px}
+  .mobile-menu{display:inline-grid;place-items:center;flex:0 0 38px}
+  .top-actions{gap:7px}
+  .content{padding:20px 15px}
+  .stats,.two-col{grid-template-columns:1fr}
+  .chat-layout{grid-template-columns:minmax(0,1fr);min-height:360px}
+  .chat-side{display:none}
+  .chat-messages{min-height:230px}
+  .hero:after{right:-25px;font-size:210px}
+}
+@media(max-width:540px){
+  .topbar{padding-inline:10px}
+  .crumb{font-size:10px}
+  .top-actions{gap:6px}
+  .top-actions>.icon-btn{display:none}
+  .avatar{width:34px;height:34px;flex:0 0 34px}
+  .content{padding:17px 12px}
+  .modules{grid-template-columns:1fr}
+  .hero{padding:22px 17px;border-radius:18px}
+  .hero h1{font-size:clamp(29px,8vw,36px)}
+  .hero-actions{align-items:stretch}
+  .hero-actions .btn{flex:1 1 100%}
+  .row-fields{grid-template-columns:1fr;gap:0}
+  .card,.panel{padding:16px}
+  .section-head{align-items:flex-start;flex-wrap:wrap}
+  .chat-compose{gap:6px;padding:9px}
+  .chat-compose .btn{padding:9px 11px}
+  .device-result strong{max-width:100%;text-align:left}
+  #toast{left:12px;right:12px;bottom:12px;text-align:center}
+}
+@media(max-width:360px){
+  .brand-name{font-size:19px}
+  .brand-sub{font-size:8px}
+  .topbar{height:58px}
+  .crumb{max-width:145px}
+  .hero h1{font-size:28px}
+  .stat-value{font-size:19px}
+}
+@media(hover:none){
+  .module:hover{transform:none}
+  .nav button:hover,.quick:hover,.btn:hover{filter:none}
+}
+@media(prefers-reduced-motion:reduce){
+  .sidebar{transition:none}
+  .module{transition:none}
+}
+
+
+/* MODULO ARCHIVOS — NUBIRA v4 */
+.files-toolbar{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.files-dropzone{position:relative;display:grid;place-items:center;gap:10px;min-height:210px;padding:25px;text-align:center;border:1.5px dashed #7199ff77;border-radius:18px;background:linear-gradient(135deg,#4d8dff12,#9565f512);transition:border-color .2s,background .2s}
+.files-dropzone.dragover{border-color:var(--cyan);background:#39d4e81c}
+.files-dropzone:focus-visible{outline:2px solid var(--cyan);outline-offset:4px}
+.files-drop-icon{width:54px;height:54px;display:grid;place-items:center;border-radius:17px;background:linear-gradient(135deg,#4d8dff33,#9565f533);font-size:25px}
+.files-dropzone h2{font-size:17px}
+.files-dropzone p{margin:0;color:var(--muted);font-size:11px;max-width:520px}
+.files-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0}
+.files-stat{padding:14px;border:1px solid var(--line);border-radius:13px;background:#ffffff06;min-width:0}
+.files-stat span{display:block;color:var(--muted);font-size:10px}
+.files-stat strong{display:block;font-size:20px;margin-top:6px;overflow-wrap:anywhere}
+.files-list{display:grid;gap:8px;margin-top:12px}
+.file-row{display:flex;align-items:center;gap:11px;min-width:0;padding:11px;border:1px solid var(--line);border-radius:12px;background:#ffffff05}
+.file-kind{width:39px;height:39px;flex:0 0 39px;display:grid;place-items:center;border-radius:11px;background:#4d8dff20;color:var(--cyan);font-size:11px;font-weight:850;text-transform:uppercase}
+.file-info{flex:1;min-width:0}
+.file-info strong{display:block;font-size:11px;overflow-wrap:anywhere}
+.file-info small{display:block;color:var(--muted);font-size:10px;margin-top:4px;overflow-wrap:anywhere}
+.file-remove{width:35px;height:35px;flex:0 0 35px;border:1px solid var(--line);border-radius:9px;background:#ffffff08;color:var(--muted)}
+.file-remove:hover{border-color:#f07878;color:#ff9a9a}
+.files-empty{padding:25px 12px;text-align:center;border:1px dashed var(--line);border-radius:13px;color:var(--muted);font-size:11px}
+.files-actions{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.files-status{min-height:18px;color:var(--muted);font-size:10px;line-height:1.5}
+.files-privacy{display:flex;gap:10px;align-items:flex-start;padding:12px;border:1px solid #48d6a033;border-radius:12px;background:#48d6a00b;color:var(--muted);font-size:10px;line-height:1.55}
+.files-privacy b{color:var(--green)}
+html[data-theme="light"] .files-stat,html[data-theme="light"] .file-row{background:#f8faff}
+@media(max-width:620px){.files-stats{grid-template-columns:1fr 1fr}.files-stat:last-child{grid-column:1/-1}.files-dropzone{min-height:190px;padding:20px 14px}.file-row{gap:8px}.file-kind{width:34px;height:34px;flex-basis:34px}}
+
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<button class="sidebar-backdrop" id="sidebarBackdrop" aria-label="Cerrar menú" tabindex="-1"></button>
+<aside class="sidebar" id="sidebar" aria-label="Navegación principal">
+  <div class="brand">
+    <div class="brand-mark">N</div>
+    <div>
+      <div class="brand-name">NUBIRA</div>
+      <div class="brand-sub">CONECTA · COMPARTE · JUEGA</div>
+    </div>
+  </div>
+
+  <div class="nav-label">ESPACIO PRINCIPAL</div>
+  <nav class="nav">
+    <button class="active" data-page="home"><span class="nav-icon">⌂</span>Inicio</button>
+    <button data-page="messages"><span class="nav-icon">◌</span>Mensajes</button>
+    <button data-page="remote"><span class="nav-icon">▣</span>Remote Play</button>
+    <button data-page="device"><span class="nav-icon">⌘</span>Device Check</button>
+    <button data-page="files"><span class="nav-icon">▤</span>Archivos</button>
+    <button data-page="ai"><span class="nav-icon">✧</span>Inteligencia artificial</button>
+    <button data-page="games"><span class="nav-icon">♧</span>Juegos</button>
+    <button data-page="extensions"><span class="nav-icon">◇</span>Extensions</button>
+  </nav>
+
+  <div class="nav-label">TU CUENTA</div>
+  <nav class="nav">
+    <button data-page="profile"><span class="nav-icon">◉</span>Mi perfil</button>
+    <button data-page="settings"><span class="nav-icon">⚙</span>Configuración</button>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="status-card">
+      <div class="status-top"><span class="dot"></span>NUBIRA en desarrollo</div>
+      <p>Tu espacio digital. Los módulos se conectarán progresivamente.</p>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+<header class="topbar">
+  <div style="display:flex;align-items:center;gap:11px">
+    <button class="icon-btn mobile-menu" id="menuToggle" aria-label="Abrir menú" aria-controls="sidebar" aria-expanded="false">☰</button>
+    <div class="crumb">NUBIRA / <strong id="crumbName">Inicio</strong></div>
+  </div>
+  <div class="top-actions">
+    <div class="search-wrap">
+      <label class="search">⌕ <input id="searchInput" type="search" placeholder="Buscar en NUBIRA..." autocomplete="off" aria-label="Buscar módulos" aria-controls="searchResults" aria-expanded="false"></label>
+      <div class="search-results" id="searchResults" role="listbox" aria-label="Resultados de búsqueda" hidden></div>
+    </div>
+    <button class="icon-btn" title="Notificaciones" aria-label="Notificaciones">♧</button>
+    <div class="avatar" id="topAvatar">NU</div>
+  </div>
+</header>
+
+<div class="content">
+
+<!-- INICIO -->
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow">Tu espacio digital</div>
+      <h1>Todo lo que necesitas.<br><span class="gradient">En un solo lugar.</span></h1>
+      <p class="subtext">Conecta con tus amigos, comparte archivos y disfruta tus juegos. NUBIRA reúne tus herramientas en una experiencia moderna y sencilla.</p>
+      <div class="hero-actions">
+        <button class="btn primary" data-go="messages">Abrir mensajes →</button>
+        <button class="btn" data-go="remote">Explorar Remote Play</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid stats">
+    <div class="stat"><div class="stat-label">Módulos principales</div><div class="stat-value">08</div><div class="stat-note">Una plataforma, varias herramientas</div></div>
+    <div class="stat"><div class="stat-label">Estado del proyecto</div><div class="stat-value">En desarrollo</div><div class="stat-note">Construcción progresiva</div></div>
+    <div class="stat"><div class="stat-label">Diseño adaptable</div><div class="stat-value">Multiplataforma</div><div class="stat-note">PC · tablet · celular</div></div>
+  </div>
+
+  <div class="section-head">
+    <div><h2>Explora NUBIRA</h2><p>Accede rápidamente a tus módulos.</p></div>
+    <span class="tag">TU PLATAFORMA</span>
+  </div>
+
+  <div class="grid modules">
+    <article class="card module" data-go="messages" tabindex="0" role="button" aria-label="Abrir Mensajes"><div class="module-icon">◌</div><h3>Mensajes</h3><p>Conversaciones y grupos con tus amigos.</p><div class="module-foot">Comunicación →</div></article>
+    <article class="card module" data-go="remote" tabindex="0" role="button" aria-label="Abrir Remote Play"><div class="module-icon">▣</div><h3>Remote Play</h3><p>Juega desde el navegador mediante streaming remoto.</p><div class="module-foot">Juego remoto →</div></article>
+    <article class="card module" data-go="device" tabindex="0" role="button" aria-label="Abrir Device Check"><div class="module-icon">⌘</div><h3>Device Check</h3><p>Comprueba las capacidades disponibles de tu dispositivo.</p><div class="module-foot">Compatibilidad →</div></article>
+    <article class="card module" data-go="files" tabindex="0" role="button" aria-label="Abrir Archivos"><div class="module-icon">▤</div><h3>Archivos</h3><p>Organiza y comparte tus documentos.</p><div class="module-foot">Transferencias →</div></article>
+    <article class="card module" data-go="ai" tabindex="0" role="button" aria-label="Abrir Inteligencia artificial"><div class="module-icon">✧</div><h3>Inteligencia artificial</h3><p>Un asistente para preguntas e ideas.</p><div class="module-foot">Asistente →</div></article>
+    <article class="card module" data-go="games" tabindex="0" role="button" aria-label="Abrir Juegos"><div class="module-icon">♧</div><h3>Juegos</h3><p>Experiencias para jugar desde NUBIRA.</p><div class="module-foot">Entretenimiento →</div></article>
+  </div>
+
+  <div class="grid two-col" style="margin-top:15px">
+    <div class="card">
+      <h3>Identidad de NUBIRA</h3>
+      <div class="quick-list">
+        <div class="quick">✦ Diseño híbrido <span>Activo</span></div>
+        <div class="quick">◈ Azul · Morado · Cian <span>Activo</span></div>
+        <div class="quick">▣ Interfaz adaptable <span>Activo</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Accesos rápidos</h3>
+      <div class="quick-list">
+        <button class="quick" data-go="profile">◉ Mi perfil <span>→</span></button>
+        <button class="quick" data-go="settings">⚙ Configuración <span>→</span></button>
+        <button class="quick" data-go="extensions">◇ Extensions <span>→</span></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MENSAJES -->
+<section class="page" id="page-messages">
+  <div class="page-title">
+    <div class="eyebrow">Comunicación</div>
+    <h1>Mensajes</h1>
+    <p class="subtext">Un espacio para conversar con tus amigos.</p>
+  </div>
+  <div class="chat-layout">
+    <aside class="chat-side">
+      <h3>Conversaciones</h3>
+      <div class="friend">◉ Chat de demostración</div>
+      <p class="notice">Los contactos reales estarán disponibles cuando conectemos el sistema de cuentas.</p>
+    </aside>
+    <div class="chat-main">
+      <div class="chat-head">Chat de demostración <span class="tag">Local</span></div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="bubble">¡Bienvenido a NUBIRA! Este es un chat de prueba.</div>
+      </div>
+      <form class="chat-compose" id="chatForm">
+        <input id="chatInput" maxlength="1000" placeholder="Escribe un mensaje..." autocomplete="off">
+        <button class="btn primary" type="submit">Enviar</button>
+      </form>
+    </div>
+  </div>
+  <p class="notice">Los mensajes de esta demostración no se envían a otras personas ni se sincronizan.</p>
+</section>
+
+<!-- REMOTE PLAY -->
+<section class="page" id="page-remote">
+  <div class="page-title">
+    <div class="eyebrow">Juego remoto</div>
+    <h1>NUBIRA Remote Play</h1>
+    <p class="subtext">Configura cómo quieres recibir una transmisión desde el equipo anfitrión.</p>
+  </div>
+
+  <div class="grid two-col">
+    <div class="panel">
+      <h3>Calidad de transmisión</h3>
+      <div class="field">
+        <label for="rpMode">Modo de calidad</label>
+        <select id="rpMode">
+          <option value="auto">Automático</option>
+          <option value="quality">Priorizar calidad</option>
+          <option value="smooth">Priorizar fluidez</option>
+          <option value="custom">Personalizado</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="rpResolution">Resolución preferida</label>
+        <select id="rpResolution">
+          <option value="auto">Automática</option>
+          <option value="720">1280 × 720</option>
+          <option value="1080">1920 × 1080</option>
+          <option value="1440">2560 × 1440</option>
+          <option value="2160">3840 × 2160</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="rpFps">Fotogramas por segundo</label>
+        <select id="rpFps">
+          <option value="auto">Automático</option>
+          <option value="30">30 FPS</option>
+          <option value="60">60 FPS</option>
+          <option value="120">120 FPS</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="rpBitrate">Bitrate preferido</label>
+        <select id="rpBitrate">
+          <option value="auto">Automático</option>
+          <option value="5">5 Mbps</option>
+          <option value="10">10 Mbps</option>
+          <option value="20">20 Mbps</option>
+          <option value="35">35 Mbps</option>
+        </select>
+      </div>
+      <button class="btn primary" id="saveRemote">Guardar preferencias</button>
+      <p class="notice" id="remoteMessage">Las preferencias se guardan en este navegador.</p>
+    </div>
+
+    <div class="panel">
+      <h3>Controles y compatibilidad</h3>
+      <label class="switch-line"><input type="checkbox" id="rpTouch" checked> Permitir controles táctiles</label>
+      <label class="switch-line"><input type="checkbox" id="rpGamepad" checked> Permitir mando Bluetooth o USB</label>
+      <label class="switch-line"><input type="checkbox" id="rpAutoQuality" checked> Adaptar calidad automáticamente</label>
+      <div class="quick-list">
+        <div class="quick">Modo espectador <span class="tag">Planificado</span></div>
+        <div class="quick">Multijugador local compatible <span class="tag">Planificado</span></div>
+        <div class="quick">Audio y vídeo WebRTC <span class="tag">Pendiente</span></div>
+      </div>
+      <p class="notice">El equipo anfitrión deberá autorizar cada sesión. El streaming todavía no está conectado.</p>
+    </div>
+  </div>
+</section>
+
+<!-- DEVICE CHECK -->
+<section class="page" id="page-device">
+  <div class="page-title">
+    <div class="eyebrow">Compatibilidad</div>
+    <h1>Device Check</h1>
+    <p class="subtext">Consulta información que tu navegador permite detectar. Algunos datos no están disponibles en todos los dispositivos.</p>
+  </div>
+  <div class="panel">
+    <div class="section-head" style="margin-top:0">
+      <h3>Información del dispositivo</h3>
+      <button class="btn primary small" id="runCheck">Volver a comprobar</button>
+    </div>
+    <div id="deviceResults">
+      <div class="device-result"><span>Estado</span><strong>Preparado para comprobar</strong></div>
+    </div>
+    <p class="notice">NUBIRA no puede consultar todos los componentes físicos desde un navegador. Los datos no disponibles aparecerán como “Sin información”.</p>
+  </div>
+</section>
+
+<!-- ARCHIVOS — NUBIRA v4 -->
+<section class="page" id="page-files">
+  <div class="page-title">
+    <div class="eyebrow">Comparte y organiza</div>
+    <h1>Archivos</h1>
+    <p class="subtext">Selecciona archivos desde tu dispositivo, revisa su información y prepara una lista antes de transferirlos.</p>
+  </div>
+
+  <div class="panel">
+    <div class="section-head" style="margin-top:0">
+      <div><h3>Agregar archivos</h3><p>Selecciona varios archivos o arrástralos a esta zona.</p></div>
+      <span class="tag">Gestión local</span>
+    </div>
+    <div class="files-dropzone" id="filesDropzone" tabindex="0" role="region" aria-label="Zona para seleccionar o arrastrar archivos">
+      <div class="files-drop-icon">⇧</div>
+      <h2>Suelta tus archivos aquí</h2>
+      <p>También puedes buscarlos en tu dispositivo. Puedes agregar más archivos en cualquier momento.</p>
+      <div class="files-toolbar">
+        <button class="btn primary" type="button" id="chooseFiles">Seleccionar archivos</button>
+        <button class="btn" type="button" id="chooseFolder">Seleccionar carpeta</button>
+      </div>
+      <input type="file" id="filesInput" multiple hidden>
+      <input type="file" id="folderInput" webkitdirectory directory multiple hidden>
+    </div>
+    <p class="notice">La selección de carpetas depende del navegador. Si tu dispositivo no lo permite, utiliza “Seleccionar archivos”.</p>
+  </div>
+
+  <div class="files-stats" aria-live="polite">
+    <div class="files-stat"><span>Archivos seleccionados</span><strong id="filesCount">0</strong></div>
+    <div class="files-stat"><span>Tamaño total</span><strong id="filesTotal">0 B</strong></div>
+    <div class="files-stat"><span>Estado</span><strong id="filesState" style="font-size:14px">Sin archivos</strong></div>
+  </div>
+
+  <div class="panel">
+    <div class="section-head" style="margin-top:0">
+      <div><h3>Tu selección</h3><p id="filesSubtitle">Aquí aparecerán los archivos que agregues.</p></div>
+      <div class="files-actions">
+        <button class="btn small" type="button" id="exportFilesList" disabled>Exportar lista</button>
+        <button class="btn small" type="button" id="clearFiles" disabled>Vaciar lista</button>
+      </div>
+    </div>
+    <div id="filesList" class="files-list" aria-live="polite">
+      <div class="files-empty">Todavía no has seleccionado archivos.</div>
+    </div>
+    <div class="files-actions" style="margin-top:15px">
+      <button class="btn primary" type="button" id="prepareFiles" disabled>Preparar envío</button>
+      <span class="files-status" id="filesMessage" role="status" aria-live="polite">Agrega archivos para comenzar.</span>
+    </div>
+  </div>
+
+  <div class="files-privacy" style="margin-top:14px">
+    <span aria-hidden="true">🔒</span>
+    <div><b>Tus archivos permanecen en tu dispositivo.</b> Esta versión solo lee sus nombres, tipos y tamaños para mostrarlos aquí. No los sube, comparte ni guarda en la nube. La transferencia real se implementará más adelante.</div>
+  </div>
+</section>
+
+<!-- IA -->
+<section class="page" id="page-ai">
+  <div class="page-title">
+    <div class="eyebrow">Ideas y respuestas</div>
+<div class="chat-container-nubira" style="width: 100%; max-width: 750px; height: 480px; background-color: #161622; border: 1px solid #252538; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; margin-top: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); font-family: sans-serif;">
+    <div class="chat-header-nubira" style="background-color: #1e1e2d; padding: 14px 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #252538;">
+        <span class="status-indicator-nubira" style="width: 9px; height: 9px; background-color: #00f0ff; border-radius: 50%; box-shadow: 0 0 10px #00f0ff;"></span>
+        <h3 style="margin: 0; font-size: 15px; color: #ffffff; font-weight: 600;">Asistente de NUBIRA</h3>
+        <span style="margin-left: auto; background-color: #007acc; color: white; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;">Ollama Activo</span>
+    </div>
+
+    <div class="chat-messages-nubira" id="nubiraChatMessages" style="flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; background-color: #0f0f17;">
+        <div class="msg-nubira bot-msg-nubira" style="background-color: #1c1c2b; color: #e2e2e9; align-self: flex-start; border-top-left-radius: 2px; border-left: 4px solid #00f0ff; max-width: 80%; padding: 12px 16px; border-radius: 14px; font-size: 14px; line-height: 1.5; word-wrap: break-word;">
+            ¡Bienvenido a NUBIRA! Soy tu IA local. ¿Qué código de JavaScript, HTML o CSS desarrollamos hoy?
+        </div>
+    </div>
+
+    <div class="chat-input-nubira" style="padding: 14px; background-color: #1e1e2d; border-top: 1px solid #252538; display: flex; gap: 10px;">
+        <input type="text" id="nubiraUserInput" placeholder="Pregúntame algo sobre código aquí..." style="flex: 1; background-color: #11111a; border: 1px solid #252538; border-radius: 8px; padding: 12px 16px; color: #ffffff; font-size: 14px; outline: none;">
+        <button id="nubiraSendBtn" style="background-color: #0055ff; color: white; border: none; border-radius: 8px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+            <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M2,21L23,12L2,3V10L17,12L2,14V21Z"/></svg>
+        </button>
+    </div>
+</div>
+</section>
+
+<!-- JUEGOS -->
+<section class="page" id="page-games">
+  <div class="page-title">
+    <div class="eyebrow">Diversión compartida</div>
+    <h1>Juegos</h1>
+    <p class="subtext">Una zona para descubrir y disfrutar experiencias desde NUBIRA.</p>
+  </div>
+  <div class="grid modules">
+    <div class="card"><div class="module-icon">▦</div><h3>Juegos rápidos</h3><p class="subtext">Experiencias sencillas para partidas cortas.</p><span class="tag">Próximamente</span></div>
+    <div class="card"><div class="module-icon">♟</div><h3>Juegos con amigos</h3><p class="subtext">Actividades para compartir.</p><span class="tag">Próximamente</span></div>
+    <div class="card"><div class="module-icon">⌘</div><h3>Tu biblioteca</h3><p class="subtext">Un lugar para descubrir juegos disponibles.</p><span class="tag">Próximamente</span></div>
+  </div>
+</section>
+
+<!-- EXTENSIONS -->
+<section class="page" id="page-extensions">
+  <div class="page-title">
+    <div class="eyebrow">Amplía tu experiencia</div>
+    <h1>NUBIRA Extensions</h1>
+    <p class="subtext">Módulos opcionales que podrás activar cuando realmente los necesites.</p>
+  </div>
+  <div class="panel">
+    <h3>Un sistema de extensiones independiente</h3>
+    <p class="subtext">Las funciones principales de NUBIRA seguirán teniendo una opción gratuita. Las extensiones serán complementos separados, opcionales y con precios claros antes de cualquier compra.</p>
+    <div class="quick-list">
+      <div class="quick">Catálogo de extensiones <span class="tag">En desarrollo</span></div>
+      <div class="quick">Activar y desactivar módulos <span class="tag">Planificado</span></div>
+      <div class="quick">Información de precios y límites <span class="tag">Planificado</span></div>
+    </div>
+    <p class="notice">No hay compras, cobros ni suscripciones en esta versión.</p>
+  </div>
+</section>
+
+<!-- PERFIL -->
+<section class="page" id="page-profile">
+  <div class="page-title">
+    <div class="eyebrow">Tu identidad</div>
+    <h1>Mi perfil</h1>
+    <p class="subtext">Personaliza cómo apareces en NUBIRA.</p>
+  </div>
+  <div class="panel">
+    <div class="profile-head">
+      <img class="profile-photo" id="profilePreview" alt="Foto de perfil" src="">
+      <div>
+        <h2 id="profileNamePreview">Usuario NUBIRA</h2>
+        <p class="subtext" id="profileUserPreview">@usuario</p>
+        <span class="tag" id="profileStatusPreview">En línea</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="profilePhoto">Foto de perfil</label>
+      <input type="file" id="profilePhoto" accept="image/*">
+    </div>
+    <div class="row-fields">
+      <div class="field">
+        <label for="profileName">Nombre visible</label>
+        <input id="profileName" maxlength="40" placeholder="Tu nombre">
+      </div>
+      <div class="field">
+        <label for="profileUser">Nombre de usuario</label>
+        <input id="profileUser" maxlength="24" placeholder="usuario">
+      </div>
+    </div>
+    <div class="field">
+      <label for="profileBio">Descripción</label>
+      <textarea id="profileBio" rows="3" maxlength="180" placeholder="Cuéntales algo sobre ti..."></textarea>
+    </div>
+    <div class="field">
+      <label for="profileStatus">Estado</label>
+      <select id="profileStatus">
+        <option>En línea</option>
+        <option>Ausente</option>
+        <option>Ocupado</option>
+        <option>Invisible</option>
+      </select>
+    </div>
+    <button class="btn primary" id="saveProfile">Guardar perfil</button>
+    <p class="notice" id="profileMessage">Tus cambios se guardan en este navegador.</p>
+  </div>
+  <p class="notice">El perfil todavía no se sincroniza entre dispositivos porque no hay cuentas conectadas.</p>
+</section>
+
+<!-- CONFIGURACIÓN -->
+<section class="page" id="page-settings">
+  <div class="page-title">
+    <div class="eyebrow">Personalización</div>
+    <h1>Configuración</h1>
+    <p class="subtext">Ajusta NUBIRA a tus preferencias.</p>
+  </div>
+
+  <div class="grid two-col">
+    <div class="panel">
+      <h3>Apariencia</h3>
+      <div class="field">
+        <label for="settingTheme">Tema</label>
+        <select id="settingTheme">
+          <option value="dark">Oscuro</option>
+          <option value="light">Claro</option>
+          <option value="auto">Automático</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="settingColor">Color principal</label>
+        <select id="settingColor">
+          <option value="#4d8dff">Azul</option>
+          <option value="#9565f5">Morado</option>
+          <option value="#39d4e8">Cian</option>
+          <option value="#e04ed0">Magenta</option>
+          <option value="#39bd83">Verde</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="settingLanguage">Idioma</label>
+        <select id="settingLanguage">
+          <option value="es">Español</option>
+          <option value="en">English (preferencia guardada)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Preferencias</h3>
+      <label class="switch-line"><input type="checkbox" id="settingNotifications"> Notificaciones</label>
+      <label class="switch-line"><input type="checkbox" id="settingSounds"> Sonidos de interfaz</label>
+      <label class="switch-line"><input type="checkbox" id="settingActivity"> Mostrar actividad a mis amigos</label>
+      <label class="switch-line"><input type="checkbox" id="settingRequests"> Permitir solicitudes de amistad</label>
+      <label class="switch-line"><input type="checkbox" id="settingMotion"> Reducir animaciones</label>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:14px">
+    <h3>Privacidad y seguridad</h3>
+    <p class="subtext">NUBIRA todavía no tiene un sistema de cuentas ni sesiones conectado. No introduzcas contraseñas reales en esta maqueta.</p>
+    <p class="notice">Cuando construyamos el sistema real, añadiremos autenticación segura, control de sesiones y opciones de privacidad.</p>
+  </div>
+
+  <button class="btn primary" id="saveSettings" style="margin-top:14px">Guardar configuración</button>
+  <p class="notice" id="settingsMessage"></p>
+</section>
+
+<footer class="footer">NUBIRA · Conecta · Comparte · Juega · Proyecto en desarrollo</footer>
+</div>
+</main>
+</div>
+
+<div id="toast" role="status" aria-live="polite" style="position:fixed;bottom:20px;right:20px;z-index:99;padding:12px 16px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--text);font-size:12px;display:none"></div>
+
+<script>
+"use strict";
+
+const $ = id => document.getElementById(id);
+
+const pageNames = {
+  home:"Inicio",
+  messages:"Mensajes",
+  remote:"Remote Play",
+  device:"Device Check",
+  files:"Archivos",
+  ai:"Inteligencia artificial",
+  games:"Juegos",
+  extensions:"NUBIRA Extensions",
+  profile:"Mi perfil",
+  settings:"Configuración"
+};
+
+function toast(message){
+  const box=$("toast");
+  box.textContent=message;
+  box.style.display="block";
+  clearTimeout(toast.timer);
+  toast.timer=setTimeout(()=>box.style.display="none",2400);
+}
+
+function setSidebarOpen(open){
+  const sidebar=$("sidebar");
+  const backdrop=$("sidebarBackdrop");
+  const toggle=$("menuToggle");
+  sidebar.classList.toggle("open",open);
+  backdrop.classList.toggle("visible",open);
+  toggle.setAttribute("aria-expanded",String(open));
+  document.body.classList.toggle("menu-open",open);
+}
+
+function showPage(name){
+  if(!pageNames[name])return;
+  document.querySelectorAll(".page").forEach(page=>{
+    page.classList.toggle("active",page.id==="page-"+name);
+  });
+  document.querySelectorAll("[data-page]").forEach(button=>{
+    const active=button.dataset.page===name;
+    button.classList.toggle("active",active);
+    if(active)button.setAttribute("aria-current","page");
+    else button.removeAttribute("aria-current");
+  });
+  $("crumbName").textContent=pageNames[name];
+  setSidebarOpen(false);
+  closeSearchResults();
+  if(location.hash!=="#"+name)history.replaceState(null,"","#"+name);
+  window.scrollTo({top:0,behavior:settings?.reducedMotion?"auto":"smooth"});
+}
+
+document.querySelectorAll("[data-page]").forEach(button=>{
+  button.addEventListener("click",()=>showPage(button.dataset.page));
+});
+document.querySelectorAll("[data-go]").forEach(button=>{
+  button.addEventListener("click",()=>showPage(button.dataset.go));
+  if(button.matches("[tabindex='0']")){
+    button.addEventListener("keydown",event=>{
+      if(event.key==="Enter"||event.key===" "){
+        event.preventDefault();showPage(button.dataset.go);
+      }
+    });
+  }
+});
+
+$("menuToggle").addEventListener("click",()=>{
+  setSidebarOpen(!$("sidebar").classList.contains("open"));
+});
+$("sidebarBackdrop").addEventListener("click",()=>setSidebarOpen(false));
+document.addEventListener("keydown",event=>{
+  if(event.key==="Escape"){
+    setSidebarOpen(false);
+    closeSearchResults();
+  }
+});
+
+/* CHAT LOCAL */
+$("chatForm").addEventListener("submit",event=>{
+  event.preventDefault();
+  const input=$("chatInput");
+  const value=input.value.trim();
+  if(!value)return;
+
+  const bubble=document.createElement("div");
+  bubble.className="bubble mine";
+  bubble.textContent=value;
+  $("chatMessages").appendChild(bubble);
+  input.value="";
+  $("chatMessages").scrollTop=$("chatMessages").scrollHeight;
+});
+
+/* ALMACENAMIENTO LOCAL SEGURO ANTE ERRORES */
+function readStorage(key,fallback){
+  try{
+    const value=localStorage.getItem(key);
+    return value?JSON.parse(value):fallback;
+  }catch(error){
+    return fallback;
+  }
+}
+function writeStorage(key,value){
+  try{
+    localStorage.setItem(key,JSON.stringify(value));
+    return true;
+  }catch(error){
+    toast("No se pudo guardar. Puede faltar espacio.");
+    return false;
+  }
+}
+
+/* PERFIL */
+const defaultProfile={
+  name:"Usuario NUBIRA",
+  username:"usuario",
+  bio:"",
+  status:"En línea",
+  avatar:""
+};
+let profile={...defaultProfile,...readStorage("nubira_profile",{})};
+
+function updateProfileView(){
+  $("profileName").value=profile.name;
+  $("profileUser").value=profile.username;
+  $("profileBio").value=profile.bio;
+  $("profileStatus").value=profile.status;
+  $("profileNamePreview").textContent=profile.name||"Usuario NUBIRA";
+  $("profileUserPreview").textContent="@"+profile.username;
+  $("profileStatusPreview").textContent=profile.status;
+  $("profilePreview").src=profile.avatar||avatarPlaceholder();
+  $("topAvatar").innerHTML="";
+  if(profile.avatar){
+    const image=document.createElement("img");
+    image.src=profile.avatar;
+    image.alt="Avatar";
+    $("topAvatar").appendChild(image);
+  }else{
+    $("topAvatar").textContent=(profile.name||"NU").slice(0,2).toUpperCase();
+  }
+}
+function avatarPlaceholder(){
+  return "data:image/svg+xml,"+encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#202d48"/><text x="50" y="66" text-anchor="middle" font-size="48" fill="#b5a5ff">N</text></svg>'
+  );
+}
+$("profilePhoto").addEventListener("change",event=>{
+  const file=event.target.files?.[0];
+  if(!file)return;
+  if(!file.type.startsWith("image/")){
+    toast("Selecciona una imagen válida.");return;
+  }
+  if(file.size>2*1024*1024){
+    toast("La imagen debe pesar menos de 2 MB.");return;
+  }
+  const reader=new FileReader();
+  reader.onload=()=>{
+    profile.avatar=reader.result;
+    updateProfileView();
+  };
+  reader.readAsDataURL(file);
+});
+$("saveProfile").addEventListener("click",()=>{
+  const username=$("profileUser").value.trim().replace(/^@/,"");
+  if(!/^[a-zA-Z0-9_.-]{3,24}$/.test(username)){
+    $("profileMessage").textContent="El usuario debe tener entre 3 y 24 caracteres. Usa letras, números, puntos, guiones o guion bajo.";
+    return;
+  }
+  profile={
+    name:$("profileName").value.trim()||"Usuario NUBIRA",
+    username,
+    bio:$("profileBio").value.trim(),
+    status:$("profileStatus").value,
+    avatar:profile.avatar||""
+  };
+  if(writeStorage("nubira_profile",profile)){
+    updateProfileView();
+    $("profileMessage").textContent="Perfil guardado correctamente.";
+    toast("Perfil actualizado.");
+  }
+});
+
+/* CONFIGURACIÓN */
+const defaultSettings={
+  theme:"dark",
+  color:"#4d8dff",
+  language:"es",
+  notifications:true,
+  sounds:false,
+  activity:true,
+  requests:true,
+  reducedMotion:false
+};
+let settings={...defaultSettings,...readStorage("nubira_settings",{})};
+
+function applySettings(){
+  let theme=settings.theme;
+  if(theme==="auto"){
+    theme=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";
+  }
+  document.documentElement.dataset.theme=theme;
+  document.documentElement.style.setProperty("--accent",settings.color);
+  document.documentElement.style.setProperty("--blue",settings.color);
+
+  if(settings.reducedMotion){
+    document.documentElement.style.scrollBehavior="auto";
+  }else{
+    document.documentElement.style.scrollBehavior="smooth";
+  }
+}
+function updateSettingsInputs(){
+  $("settingTheme").value=settings.theme;
+  $("settingColor").value=settings.color;
+  $("settingLanguage").value=settings.language;
+  $("settingNotifications").checked=settings.notifications;
+  $("settingSounds").checked=settings.sounds;
+  $("settingActivity").checked=settings.activity;
+  $("settingRequests").checked=settings.requests;
+  $("settingMotion").checked=settings.reducedMotion;
+}
+$("saveSettings").addEventListener("click",()=>{
+  settings={
+    theme:$("settingTheme").value,
+    color:$("settingColor").value,
+    language:$("settingLanguage").value,
+    notifications:$("settingNotifications").checked,
+    sounds:$("settingSounds").checked,
+    activity:$("settingActivity").checked,
+    requests:$("settingRequests").checked,
+    reducedMotion:$("settingMotion").checked
+  };
+  if(writeStorage("nubira_settings",settings)){
+    applySettings();
+    $("settingsMessage").textContent="Configuración guardada correctamente.";
+    toast("Preferencias actualizadas.");
+  }
+});
+window.matchMedia("(prefers-color-scheme: light)").addEventListener?.("change",()=>{
+  if(settings.theme==="auto")applySettings();
+});
+
+/* REMOTE PLAY */
+const defaultRemote={
+  mode:"auto",resolution:"auto",fps:"auto",bitrate:"auto",
+  touch:true,gamepad:true,autoQuality:true
+};
+let remote={...defaultRemote,...readStorage("nubira_remote",{})};
+
+function updateRemoteInputs(){
+  $("rpMode").value=remote.mode;
+  $("rpResolution").value=remote.resolution;
+  $("rpFps").value=remote.fps;
+  $("rpBitrate").value=remote.bitrate;
+  $("rpTouch").checked=remote.touch;
+  $("rpGamepad").checked=remote.gamepad;
+  $("rpAutoQuality").checked=remote.autoQuality;
+}
+$("rpMode").addEventListener("change",()=>{
+  const mode=$("rpMode").value;
+  if(mode==="quality"){
+    $("rpResolution").value="1080";
+    $("rpFps").value="30";
+  }else if(mode==="smooth"){
+    $("rpResolution").value="720";
+    $("rpFps").value="60";
+  }
+});
+$("rpResolution").addEventListener("change",()=>{
+  if($("rpMode").value!=="auto")$("rpMode").value="custom";
+});
+$("rpFps").addEventListener("change",()=>{
+  if($("rpMode").value!=="auto")$("rpMode").value="custom";
+});
+$("rpBitrate").addEventListener("change",()=>{
+  if($("rpMode").value!=="auto")$("rpMode").value="custom";
+});
+$("saveRemote").addEventListener("click",()=>{
+  remote={
+    mode:$("rpMode").value,
+    resolution:$("rpResolution").value,
+    fps:$("rpFps").value,
+    bitrate:$("rpBitrate").value,
+    touch:$("rpTouch").checked,
+    gamepad:$("rpGamepad").checked,
+    autoQuality:$("rpAutoQuality").checked
+  };
+  if(writeStorage("nubira_remote",remote)){
+    $("remoteMessage").textContent="Preferencias de Remote Play guardadas.";
+    toast("Preferencias guardadas.");
+  }
+});
+
+/* DEVICE CHECK */
+function deviceValue(value){
+  return value===undefined||value===null||value===""?"Sin información":value;
+}
+async function runDeviceCheck(){
+  const results=[];
+  const add=(name,value)=>results.push({name,value:deviceValue(value)});
+  add("Sistema / navegador",navigator.userAgent);
+  add("Idioma del navegador",navigator.language);
+  add("Plataforma reportada",navigator.platform);
+  add("Núcleos lógicos",navigator.hardwareConcurrency);
+  add("Memoria reportada",navigator.deviceMemory?navigator.deviceMemory+" GB":"No disponible");
+  add("Resolución de pantalla",screen.width+" × "+screen.height);
+  add("Área disponible",screen.availWidth+" × "+screen.availHeight);
+  add("Profundidad de color",screen.colorDepth+" bits");
+  add("Conexión segura",location.protocol==="https:"?"Sí":"No (HTTP/local)");
+  add("Conexión de red",navigator.onLine?"Conectado":"Sin conexión");
+  add("Idioma preferido",navigator.language);
+
+  let connection=navigator.connection||navigator.mozConnection||navigator.webkitConnection;
+  add("Tipo de conexión",connection?.effectiveType);
+  add("Velocidad estimada",connection?.downlink?connection.downlink+" Mbps":"Sin información");
+  add("Latencia estimada",connection?.rtt?connection.rtt+" ms":"Sin información");
+
+  let gamepad="No detectado";
+  if(navigator.getGamepads){
+    const pads=[...navigator.getGamepads()].filter(Boolean);
+    if(pads.length)gamepad=pads.map(p=>p.id).join(", ");
+  }
+  add("Mando conectado",gamepad);
+  add("Cámara disponible","Se comprobará al solicitar permiso");
+  add("Micrófono disponible","Se comprobará al solicitar permiso");
+
+  let webgl="No disponible";
+  try{
+    const canvas=document.createElement("canvas");
+    const gl=canvas.getContext("webgl")||canvas.getContext("experimental-webgl");
+    if(gl)webgl="Compatible";
+  }catch(error){}
+  add("WebGL",webgl);
+  add("Memoria y procesador exactos","El navegador no permite consultarlos de forma universal");
+
+  $("deviceResults").innerHTML="";
+  results.forEach(item=>{
+    const row=document.createElement("div");
+    row.className="device-result";
+    const label=document.createElement("span");
+    const value=document.createElement("strong");
+    label.textContent=item.name;
+    value.textContent=item.value;
+    row.append(label,value);
+    $("deviceResults").appendChild(row);
+  });
+}
+$("runCheck").addEventListener("click",runDeviceCheck);
+
+/* BÚSQUEDA DE MÓDULOS */
+const searchAliases={
+  home:["principal","portada","dashboard"],
+  messages:["chat","chats","conversaciones","amigos"],
+  remote:["streaming","transmision","transmisión","jugar remoto"],
+  device:["dispositivo","compatibilidad","hardware","equipo"],
+  files:["archivos","transferencias","transferir","documentos","nube"],
+  ai:["ia","asistente","inteligencia","preguntas"],
+  games:["gaming","videojuegos","juegos"],
+  extensions:["extensiones","complementos","addons"],
+  profile:["cuenta","usuario","avatar"],
+  settings:["ajustes","preferencias","tema"]
+};
+let selectedSearchIndex=-1;
+let currentSearchResults=[];
+
+function closeSearchResults(){
+  const results=$("searchResults");
+  if(!results)return;
+  results.hidden=true;
+  results.innerHTML="";
+  $("searchInput").setAttribute("aria-expanded","false");
+  $("searchInput").removeAttribute("aria-activedescendant");
+  selectedSearchIndex=-1;
+  currentSearchResults=[];
+}
+
+function renderSearchResults(query){
+  const box=$("searchResults");
+  const normalized=query.toLowerCase().trim();
+  box.innerHTML="";
+  selectedSearchIndex=-1;
+  if(!normalized){closeSearchResults();return;}
+
+  currentSearchResults=Object.entries(pageNames).filter(([id,name])=>{
+    const terms=[id,name,...(searchAliases[id]||[])].join(" ").toLowerCase();
+    return terms.includes(normalized);
+  });
+
+  if(!currentSearchResults.length){
+    const empty=document.createElement("div");
+    empty.className="search-empty";
+    empty.textContent="No encontramos módulos relacionados.";
+    box.appendChild(empty);
+  }else{
+    currentSearchResults.forEach(([id,name],index)=>{
+      const button=document.createElement("button");
+      button.type="button";
+      button.className="search-result";
+      button.id="search-option-"+id;
+      button.setAttribute("role","option");
+      button.setAttribute("aria-selected","false");
+      const icon=document.createElement("span");
+      icon.textContent={home:"⌂",messages:"◌",remote:"▣",device:"⌘",files:"▤",ai:"✧",games:"♧",extensions:"◇",profile:"◉",settings:"⚙"}[id]||"•";
+      const label=document.createElement("span");
+      label.textContent=name;
+      const hint=document.createElement("small");
+      hint.textContent="Abrir módulo";
+      label.appendChild(hint);
+      button.append(icon,label);
+      button.addEventListener("click",()=>{
+        $("searchInput").value="";
+        showPage(id);
+      });
+      box.appendChild(button);
+    });
+  }
+  box.hidden=false;
+  $("searchInput").setAttribute("aria-expanded","true");
+}
+
+function selectSearchResult(index){
+  const options=[...$("searchResults").querySelectorAll(".search-result")];
+  options.forEach((option,i)=>{
+    const selected=i===index;
+    option.setAttribute("aria-selected",String(selected));
+    if(selected){
+      option.scrollIntoView({block:"nearest"});
+      $("searchInput").setAttribute("aria-activedescendant",option.id);
+    }
+  });
+  selectedSearchIndex=index;
+}
+
+$("searchInput").addEventListener("input",event=>renderSearchResults(event.target.value));
+$("searchInput").addEventListener("keydown",event=>{
+  if(event.key==="ArrowDown"&&currentSearchResults.length){
+    event.preventDefault();
+    selectSearchResult(Math.min(selectedSearchIndex+1,currentSearchResults.length-1));
+  }else if(event.key==="ArrowUp"&&currentSearchResults.length){
+    event.preventDefault();
+    selectSearchResult(Math.max(selectedSearchIndex-1,0));
+  }else if(event.key==="Enter"){
+    event.preventDefault();
+    if(selectedSearchIndex>=0&&currentSearchResults[selectedSearchIndex]){
+      const id=currentSearchResults[selectedSearchIndex][0];
+      $("searchInput").value="";showPage(id);
+    }else if(currentSearchResults.length===1){
+      const id=currentSearchResults[0][0];
+      $("searchInput").value="";showPage(id);
+    }else if(!currentSearchResults.length){
+      toast("No encontramos ese módulo.");
+    }
+  }else if(event.key==="Escape"){
+    closeSearchResults();
+  }
+});
+document.addEventListener("click",event=>{
+  if(!event.target.closest(".search-wrap"))closeSearchResults();
+});
+
+
+/* MODULO ARCHIVOS — SELECCION LOCAL, SIN SUBIDAS */
+const selectedFiles=[];
+const filesInput=$("filesInput");
+const folderInput=$("folderInput");
+const filesDropzone=$("filesDropzone");
+
+function formatFileSize(bytes){
+  if(!Number.isFinite(bytes)||bytes<0)return "Tamaño desconocido";
+  if(bytes===0)return "0 B";
+  const units=["B","KB","MB","GB","TB"];
+  const index=Math.min(Math.floor(Math.log(bytes)/Math.log(1024)),units.length-1);
+  const value=bytes/Math.pow(1024,index);
+  return `${value.toLocaleString("es-CO",{maximumFractionDigits:index===0?0:2})} ${units[index]}`;
+}
+function fileExtension(file){
+  const name=file.name||"";
+  const dot=name.lastIndexOf(".");
+  return dot>0?name.slice(dot+1, dot+7).toUpperCase():"FILE";
+}
+function addFiles(fileList){
+  const incoming=Array.from(fileList||[]);
+  if(!incoming.length)return;
+  let added=0,duplicates=0;
+  incoming.forEach(file=>{
+    const duplicate=selectedFiles.some(item=>item.name===file.name&&item.size===file.size&&item.lastModified===file.lastModified);
+    if(duplicate){duplicates++;return;}
+    selectedFiles.push(file);added++;
+  });
+  renderFiles();
+  $("filesMessage").textContent=added
+    ?`${added} archivo(s) agregado(s)${duplicates?`; ${duplicates} duplicado(s) omitido(s)`:""}.`
+    :`No se agregaron archivos nuevos${duplicates?`; ${duplicates} duplicado(s) omitido(s)`:""}.`;
+}
+function renderFiles(){
+  const list=$("filesList");
+  const count=selectedFiles.length;
+  const total=selectedFiles.reduce((sum,file)=>sum+file.size,0);
+  $("filesCount").textContent=count.toLocaleString("es-CO");
+  $("filesTotal").textContent=formatFileSize(total);
+  $("filesState").textContent=count?"Listos para revisar":"Sin archivos";
+  $("filesSubtitle").textContent=count?`${count} elemento(s) en esta selección.`:"Aquí aparecerán los archivos que agregues.";
+  $("clearFiles").disabled=count===0;
+  $("exportFilesList").disabled=count===0;
+  $("prepareFiles").disabled=count===0;
+  if(!count){
+    list.innerHTML='<div class="files-empty">Todavía no has seleccionado archivos.</div>';
+    return;
+  }
+  list.replaceChildren();
+  selectedFiles.forEach((file,index)=>{
+    const row=document.createElement("div");row.className="file-row";
+    const kind=document.createElement("div");kind.className="file-kind";kind.textContent=fileExtension(file);
+    const info=document.createElement("div");info.className="file-info";
+    const name=document.createElement("strong");name.textContent=file.name||"Archivo sin nombre";
+    const meta=document.createElement("small");
+    const type=file.type||"Tipo no identificado";
+    meta.textContent=`${formatFileSize(file.size)} · ${type}`;
+    info.append(name,meta);
+    const remove=document.createElement("button");remove.className="file-remove";remove.type="button";
+    remove.textContent="×";remove.setAttribute("aria-label",`Quitar ${file.name||"archivo"} de la lista`);
+    remove.addEventListener("click",()=>{
+      selectedFiles.splice(index,1);renderFiles();
+      $("filesMessage").textContent="Archivo quitado de la selección.";
+    });
+    row.append(kind,info,remove);list.append(row);
+  });
+}
+$("chooseFiles").addEventListener("click",()=>filesInput.click());
+$("chooseFolder").addEventListener("click",()=>folderInput.click());
+filesInput.addEventListener("change",event=>{addFiles(event.target.files);event.target.value="";});
+folderInput.addEventListener("change",event=>{addFiles(event.target.files);event.target.value="";});
+filesDropzone.addEventListener("keydown",event=>{
+  if(event.target!==filesDropzone)return;
+  if(event.key==="Enter"||event.key===" "){event.preventDefault();filesInput.click();}
+});
+["dragenter","dragover"].forEach(type=>filesDropzone.addEventListener(type,event=>{
+  event.preventDefault();event.stopPropagation();filesDropzone.classList.add("dragover");
+}));
+["dragleave","drop"].forEach(type=>filesDropzone.addEventListener(type,event=>{
+  event.preventDefault();event.stopPropagation();filesDropzone.classList.remove("dragover");
+}));
+filesDropzone.addEventListener("drop",event=>addFiles(event.dataTransfer?.files));
+$("clearFiles").addEventListener("click",()=>{
+  selectedFiles.length=0;renderFiles();$("filesMessage").textContent="La lista quedó vacía.";
+});
+$("exportFilesList").addEventListener("click",()=>{
+  if(!selectedFiles.length)return;
+  const total=selectedFiles.reduce((sum,file)=>sum+file.size,0);
+  const lines=["NUBIRA — Lista local de archivos","Esta lista no contiene los archivos originales.","",...selectedFiles.map((file,index)=>`${index+1}. ${file.name} | ${formatFileSize(file.size)} | ${file.type||"Tipo no identificado"}`),"",`Cantidad: ${selectedFiles.length}`,`Tamaño total: ${formatFileSize(total)}`];
+  const blob=new Blob([lines.join("\n")],{type:"text/plain;charset=utf-8"});
+  const url=URL.createObjectURL(blob);const link=document.createElement("a");
+  link.href=url;link.download="NUBIRA-lista-de-archivos.txt";document.body.append(link);link.click();link.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  $("filesMessage").textContent="Se exportó la lista de nombres y tamaños. Los archivos originales no se copiaron.";
+});
+$("prepareFiles").addEventListener("click",()=>{
+  if(!selectedFiles.length)return;
+  $("filesMessage").textContent="Selección revisada y lista. El envío real todavía no está conectado; tus archivos siguen en este dispositivo.";
+  toast("Lista preparada. La transferencia estará disponible más adelante.");
+});
+renderFiles();
+
+/* INICIALIZACIÓN */
+updateProfileView();
+updateSettingsInputs();
+applySettings();
+updateRemoteInputs();
+runDeviceCheck();
+const initialPage=location.hash.replace(/^#/,"");
+if(pageNames[initialPage])showPage(initialPage);
+else history.replaceState(null,"","#home");
+</script>
+<!-- CONEXIÓN JAVASCRIPT DIRECTA A OLLAMA -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const chatMessages = document.getElementById("nubiraChatMessages");
+        const userInput = document.getElementById("nubiraUserInput");
+        const sendBtn = document.getElementById("nubiraSendBtn");
+
+        if (!chatMessages || !userInput || !sendBtn) return;
+
+        let chatHistory = [
+            { role: "system", content: "Eres el asistente de NUBIRA. Experto en JavaScript, HTML5 y CSS3. Ayuda al usuario a escribir código limpio y moderno. Responde siempre en español de forma concisa." }
+        ];
+
+        function appendMessage(text, sender) {
+            const messageDiv = document.createElement("div");
+            messageDiv.style.maxWidth = "80%";
+            messageDiv.style.padding = "12px 16px";
+            messageDiv.style.borderRadius = "14px";
+            messageDiv.style.fontSize = "14px";
+            messageDiv.style.lineHeight = "1.5";
+            messageDiv.style.wordWrap = "break-word";
+            messageDiv.style.whiteSpace = "pre-wrap";
+
+            if (sender === "user") {
+                messageDiv.style.backgroundColor = "#0055ff";
+                messageDiv.style.color = "#ffffff";
+                messageDiv.style.alignSelf = "flex-end";
+                messageDiv.style.borderTopRightRadius = "2px";
+            } else {
+                messageDiv.style.backgroundColor = "#1c1c2b";
+                messageDiv.style.color = "#e2e2e9";
+                messageDiv.style.alignSelf = "flex-start";
+                messageDiv.style.borderTopLeftRadius = "2px";
+                messageDiv.style.borderLeft = "4px solid #00f0ff";
+            }
+
+            messageDiv.textContent = text;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function send() {
+            const text = userInput.value.trim();
+            if (text === "") return;
+
+            appendMessage(text, "user");
+            chatHistory.push({ role: "user", content: text });
+            userInput.value = "";
+
+            fetch(' https://sister-tuesday-vagueness.ngrok-free.dev/api/Chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true' },
+                body: JSON.stringify({
+                    model: "qwen2.5-coder:1.5b",
+                    messages: chatHistory,
+                    stream: false
+                })
+            })
+            .then(res => {
+                if (!res.ok) throw new Error();
+                return res.json();
+            })
+            .then(data => {
+                if (data.message && data.message.content) {
+                    const botResponse = data.message.content;
+                    appendMessage(botResponse, "bot");
+                    chatHistory.push({ role: "assistant", content: botResponse });
+                }
+            })
+            .catch(() => {
+                appendMessage("Error: No se pudo conectar con Ollama. Asegúrate de tener la terminal abierta.", "bot");
+            });
+        }
+
+        sendBtn.addEventListener("click", send);
+        userInput.addEventListener("keypress", (e) => { if (e.key === "Enter") send(); });
+    });
+</script>
+
+</body>
+</html>
