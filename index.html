@@ -1599,8 +1599,12 @@ else history.replaceState(null,"","#home");
 
             fetch(' https://sister-tuesday-vagueness.ngrok-free.dev/api/Chat', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json',
-        'ngrok-skip-browser-warning': 'true' },
+				mode: 'cors',
+                headers: {
+				    'Content-Type': 'application/json',
+					'X-Requested-With': 'XMLHttpRequest',
+                    'ngrok-skip-browser-warning': 'true' 
+					},
                 body: JSON.stringify({
                     model: "qwen2.5-coder:1.5b",
                     messages: chatHistory,
