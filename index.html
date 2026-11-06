@@ -1597,16 +1597,16 @@ else history.replaceState(null,"","#home");
             chatHistory.push({ role: "user", content: text });
             userInput.value = "";
 
-            fetch('http://ngrok-free.dev', {
-                method: 'POST',
-				mode: 'cors',
-                headers: { 'Content-Type': 'application/json',
-                            'ngrok-skip-browser-warning': 'true'
-		                	},
-                body: JSON.stringify({
-                    model: "qwen2.5-coder:1.5b",
-                    messages: chatHistory,
-                    stream: false
+            fetch('https://herokuapp.com', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+    },
+    body: JSON.stringify({
+        model: "qwen2.5-coder:1.5b",
+        messages: chatHistory,
+        stream: false
                 })
             })
             .then(res => {
